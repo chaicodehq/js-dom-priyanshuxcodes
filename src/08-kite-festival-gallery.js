@@ -80,20 +80,76 @@
  */
 export function renderKiteCard(kite) {
   // Your code here
+  if(!kite) return null;
+
+  const { name, color, size, maker, image } = kite;
+
+  if(!name || !color || !size || !maker || !image) return null
+  const div = document.createElement('div') ;
+  div.classList.add('kite-card');
+  div.innerHTML = `
+  <img src="${image}" alt="${name}" />
+  <h3 class="kite-name">${name}</h3>
+  <p class="kite-maker">by ${maker}</p>
+  <p class="kite-info">${size} - ${color}</p>
+  `
+  return div
 }
 
 export function renderGallery(container, kites) {
   // Your code here
+  if(!container || !Array.isArray(kites)) return -1;
+
+  container.innerHTML = '';
+  let count = 0;
+  kites.forEach(kite => {
+    const card = renderKiteCard(kite);
+    if(card) {
+      container.appendChild(card);
+      count++;
+    }
+  });
+  return count;
 }
 
 export function filterKites(container, kites, filterFn) {
   // Your code here
+  if(!container || !Array.isArray(kites) || typeof filterFn !== 'function') return -1;
+
+  const filtered = kites.filter(kite => filterFn(kite) === true);
+
+  return renderGallery(container, filtered);
 }
 
-export function sortAndRender(container, kites, sortField, order) {
+export function sortAndRender(container, kites, sortField, order = 'asc') {
   // Your code here
+  if(!container || !Array.isArray(kites)) return [];
+
+  const copy = [...kites];
+  const sorted = copy.sort((a, b) => {
+    if (!a[sortField] || !b[sortField]) return 0;
+
+    if (a[sortField] < b[sortField]) return order === "asc" ? -1 : 1;
+    if (a[sortField] > b[sortField]) return order === "asc" ? 1 : -1;
+    return 0;
+  })
+  renderGallery(container, sorted);
+  return sorted;
 }
+
 
 export function renderEmptyState(container, message) {
   // Your code here
+  if (!container) return false;
+
+  if (container.children.length === 0) {
+    const p = document.createElement("p");
+    p.classList.add("empty-state");
+    p.textContent = message;
+
+    container.appendChild(p);
+    return true;
+  }
+
+  return false;
 }

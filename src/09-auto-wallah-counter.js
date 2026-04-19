@@ -88,28 +88,69 @@
  */
 export function findQueueContainer(element) {
   // Your code here
+  if(!element) return null;
+  return element.closest('.queue-container');
 }
 
 export function getNextInQueue(element) {
   // Your code here
+  if(!element) return null;
+  return element.nextElementSibling;
+
 }
 
 export function getPreviousInQueue(element) {
   // Your code here
+  if(!element) return null;
+  return element.previousElementSibling;
 }
 
 export function getQueuePosition(element) {
   // Your code here
+  if(!element) return -1;
+
+  const parent = element.closest('.queue-container');
+  if(!parent) return -1;
+
+  const arr = Array.from(parent.children);
+  return arr.indexOf(element) + 1;
 }
 
 export function moveToFront(element) {
   // Your code here
+  if(!element) return false;
+
+  const parent = element.closest('.queue-container');
+  if(!parent) return false;
+
+  if(parent.firstElementChild === element) return false;
+
+  parent.insertBefore(element, parent.firstChild);
+  return true;
 }
 
 export function removeFromQueue(element) {
   // Your code here
+  if(!element) return null;
+
+  const parent = element.closest('.queue-container');
+  if(!parent) return null;
+
+  return parent.removeChild(element);
 }
 
 export function getQueueStats(queueContainer) {
   // Your code here
+  if(!queueContainer) return null;
+
+  const obj = {total: 0, waiting: 0, serving: 0, completed: 0};
+
+  const children = Array.from(queueContainer.children);
+
+  children.forEach(e => {
+    obj.total++;
+    obj[Array.from(e.classList)[1]]++;
+  });
+
+  return obj;
 }

@@ -39,7 +39,7 @@
  *      - Event delegation on cardElement for click events
  *      - Clicking any element with [data-editable] attribute:
  *        - Removes "editing" class and contentEditable from any currently
- *          editing element inside cardElement
+ *          editing eleventement inside cardElement
  *        - Sets clicked element's contentEditable = "true"
  *        - Adds class "editing" to clicked element
  *      - Clicking on cardElement itself (not on a [data-editable] child):
@@ -68,12 +68,125 @@
  */
 export function setupGuestList(containerElement) {
   // Your code here
+  if(!containerElement) return null;
+
+  containerElement.addEventListener("click", (event) => {
+    const removeBtn = event.target.closest(".remove-btn");
+    if (removeBtn) {
+      const guestItem = removeBtn.closest(".guest-item");
+      if (guestItem) {
+        guestItem.remove();
+      }
+    }
+  });
+
+  return {
+    addGuest(name, side) {
+      const guestItem = document.createElement("div");
+      guestItem.className = "guest-item";
+      guestItem.dataset.name = name;
+      guestItem.dataset.side = side;
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = name;
+      guestItem.appendChild(nameSpan);
+
+      const removeButton = document.createElement("button");
+      removeButton.className = "remove-btn";
+      removeButton.textContent = "Remove";
+      guestItem.appendChild(removeButton);
+
+      containerElement.appendChild(guestItem);
+      return guestItem;
+    },
+    removeGuest(name) {
+      const guestItem = containerElement.querySelector(`.guest-item[data-name="${name}"]`);
+      if (guestItem) {
+        guestItem.remove();
+        return true;
+      }
+      return false;
+    },
+    getGuests() {
+      const guests = [];
+      const guestItems = containerElement.querySelectorAll(".guest-item");
+      guestItems.forEach((item) => {
+        guests.push({
+          name: item.dataset.name,
+          side: item.dataset.side,
+        });
+      });
+      return guests;
+    },
+  };
 }
 
 export function setupThemeSelector(containerElement, previewElement) {
   // Your code here
+  if(!containerElement || !previewElement) return null;
+
+  const btn1 = document.createElement('button');
+  btn1.classList.add('theme-btn');
+  btn1.textContent = 'traditional';
+  btn1.dataset.theme = 'traditional';
+
+  const btn2 = document.createElement('button');
+  btn2.classList.add('theme-btn');
+  btn2.textContent = 'modern';
+  btn2.dataset.theme = 'modern';
+
+  const btn3 = document.createElement('button');
+  btn3.classList.add('theme-btn')
+  btn3.textContent = 'royal';
+  btn3.dataset.theme = 'royal';
+
+  containerElement.appendChild(btn1);
+  containerElement.appendChild(btn2);
+  containerElement.appendChild(btn3);
+
+  containerElement.addEventListener('click', (event) => {
+    const themeBtn = event.target.closest('.theme-btn');
+    if(themeBtn) {
+      previewElement.className = themeBtn.dataset.theme;
+      previewElement.dataset.theme = themeBtn.dataset.theme;
+    }
+  })
+
+  return {
+    getTheme() {
+      return previewElement.dataset.theme || null;
+    }
+  }
 }
 
 export function setupCardEditor(cardElement) {
-  // Your code here
+  if (!cardElement) return null;
+
+  const clearEditing = () => {
+    const current = cardElement.querySelector(".editing");
+    if (current) {
+      current.classList.remove("editing");
+      current.contentEditable = "false";
+    }
+  };
+
+  cardElement.addEventListener("click", (event) => {
+    const editable = event.target.closest("[data-editable]");
+
+    if (editable && cardElement.contains(editable)) {
+      clearEditing();
+
+      editable.contentEditable = "true";
+      editable.classList.add("editing");
+    } else {
+      clearEditing();
+    }
+  });
+
+  return {
+    getContent(field) {
+      const el = cardElement.querySelector(`[data-editable="${field}"]`);
+      return el ? el.textContent : null;
+    },
+  };
 }

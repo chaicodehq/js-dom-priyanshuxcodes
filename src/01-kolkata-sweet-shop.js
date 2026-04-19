@@ -13,7 +13,7 @@
  *      - Creates a div element with class "sweet-item"
  *      - Inside div: h3 (name), p with class "price" (text: "₹{price}"),
  *        span with class "category" (text: category)
- *      - Returns the div element
+ *      - Returns the div element 
  *      - Validation: name must be string, price must be number, category must be string
  *      - Agar koi bhi param missing ya invalid type, return null
  *
@@ -62,12 +62,42 @@
  */
 export function createSweetItem(name, price, category) {
   // Your code here
+  if(typeof name !== 'string' || typeof price !== 'number' || typeof category !== 'string') {
+    return null;
+  }
+
+  const div = document.createElement('div');
+  div.classList.add('sweet-item');
+  
+  div.innerHTML = `<h3>${name}</h3> <p class="price">₹${price}</p> <span class="category">${category}</span>`;
+  return div;
 }
 
 export function buildMenuBoard(sweets) {
   // Your code here
+  if(!Array.isArray(sweets)) return null;
+
+  const div = document.createElement('div');
+  div.id = "menu-board";
+  if(sweets.length === 0) return div;
+
+  sweets.forEach(sweet => {
+    const subDiv = createSweetItem(sweet.name, sweet.price, sweet.category);
+    div.appendChild(subDiv);
+  });
+
+  return div;
+
 }
 
 export function addSpecialBadge(sweetElement, badgeText) {
   // Your code here
+  if(sweetElement === null || sweetElement === undefined ||  typeof badgeText !== 'string' || badgeText.length === 0) return null
+
+  const span = document.createElement('span');
+  span.classList.add('special-badge');
+  span.textContent = badgeText;
+
+  sweetElement.appendChild(span);
+  return sweetElement;
 }
